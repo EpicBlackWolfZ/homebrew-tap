@@ -1,0 +1,80 @@
+name: Tap CI
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: tap-ci-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  check:
+    name: Scripts and update policy
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Validate reviewed upstream pin
+        id: pin
+        run: |
+          read -r ref < microfat-tools.ref
+          [[ "$ref" =~ ^[0-9a-f]{40}$ ]]
+          echo "ref=$ref" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: EpicBlackWolfZ/microfat
+          ref: ${{ steps.pin.outputs.ref }}
+          path: microfat-tools
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: '1.27.1'
+          cache-dependency-path: microfat-tools/go.sum
+      - uses: go-task/setup-task@a00fbb05ce67b35648be3c78cbc9fd85354c757e # v2.2.0
+        with:
+          version: '3.53.1'
+      - name: Install pinned ShellCheck and check workflows
+        run: |
+          mkdir -p "$RUNNER_TEMP/tap-tools"
+          bash microfat-tools/scripts/install-shellcheck.sh "$RUNNER_TEMP/tap-tools"
+          export PATH="$RUNNER_TEMP/tap-tools:$PATH"
+          task check
+          go install github.com/rhysd/actionlint/cmd/actionlint@v1.7.12
+          actionlint
+      - name: Refuse recipe downgrade against current main
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p .work
+          git fetch --quiet origin main
+          if git cat-file -e origin/main:Casks/microfat.rb 2>/dev/null; then
+            git show origin/main:Casks/microfat.rb > .work/current.rb
+            test -s Casks/microfat.rb
+          else
+            : > .work/current.rb
+          fi
+          if [ ! -f Casks/microfat.rb ]; then exit 0; fi
+          current="$PWD/.work/current.rb"
+          candidate="$PWD/Casks/microfat.rb"
+          cd microfat-tools
+          go run ./internal/cmd/homebrew-release update-needed --cask "$current" --candidate "$candidate"
+  qualify:
+    needs: check
+    uses: ./.github/workflows/qualify-microfat.yml
+  complete:
+    name: Tap CI Complete
+    if: always()
+    needs: [check, qualify]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Require every prerequisite
+        env:
+          CHECK_RESULT: ${{ needs.check.result }}
+          QUALIFY_RESULT: ${{ needs.qualify.result }}
+        run: test "$CHECK_RESULT" = success && test "$QUALIFY_RESULT" = success

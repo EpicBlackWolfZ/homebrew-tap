@@ -1,0 +1,75 @@
+name: Qualify microfat
+on:
+  workflow_call:
+    inputs:
+      candidate-artifact:
+        type: string
+        default: ''
+permissions:
+  contents: read
+jobs:
+  native:
+    name: Native Homebrew (${{ matrix.arch }})
+    runs-on: ${{ matrix.arch == 'amd64' && 'ubuntu-24.04' || 'ubuntu-24.04-arm' }}
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [amd64, arm64]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Validate reviewed upstream pin
+        id: pin
+        shell: bash
+        run: |
+          read -r ref < microfat-tools.ref
+          [[ "$ref" =~ ^[0-9a-f]{40}$ ]]
+          echo "ref=$ref" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: EpicBlackWolfZ/microfat
+          ref: ${{ steps.pin.outputs.ref }}
+          path: microfat-tools
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: '1.27.1'
+          cache-dependency-path: microfat-tools/go.sum
+      - uses: go-task/setup-task@a00fbb05ce67b35648be3c78cbc9fd85354c757e # v2.2.0
+        with:
+          version: '3.53.1'
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        if: inputs.candidate-artifact != ''
+        with:
+          name: ${{ inputs.candidate-artifact }}
+          path: .work/candidate
+      - name: Authenticate recipe and qualify real lifecycle
+        env:
+          CANDIDATE_ARTIFACT: ${{ inputs.candidate-artifact }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p .work
+          cp microfat-tools.ref .work/tooling-source.txt
+          candidate=""
+          if [ -n "$CANDIDATE_ARTIFACT" ]; then
+            candidate="$PWD/.work/candidate/microfat.rb"
+            test -s "$candidate"
+          elif [ -f Casks/microfat.rb ]; then
+            candidate="$PWD/Casks/microfat.rb"
+          fi
+          task --dir microfat-tools homebrew-check CASK="$candidate"
+          task --dir microfat-tools qualify-homebrew OUTPUT="$PWD/.work/qualification" CASK="$candidate"
+      - name: Preserve native evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: microfat-homebrew-${{ matrix.arch }}-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 14
+          include-hidden-files: true
+          path: |
+            .work/tooling-source.txt
+            .work/qualification/commands.log
+            .work/qualification/brew-logs/
+            .work/qualification/published/verification.json
