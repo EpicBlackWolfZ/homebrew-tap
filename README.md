@@ -62,6 +62,8 @@ Install Task v3.53.1, Go 1.27.1 and ShellCheck v0.11.0. Check out
 ```bash
 task check
 task qualify
+# Repeat qualification with fresh staging:
+task qualify OUTPUT=.work/qualification-2
 ```
 
 Qualification creates a disposable Homebrew installation under `.work`; it does

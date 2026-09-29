@@ -15,5 +15,7 @@ tasks:
       - |-
         candidate=""
         if [ -f Casks/microfat.rb ]; then candidate="$PWD/Casks/microfat.rb"; fi
+        output={{.OUTPUT | default ".work/qualification" | shellQuote}}
+        case "$output" in /*) ;; *) output="$PWD/$output" ;; esac
         task --dir microfat-tools qualify-homebrew \
-          OUTPUT="$PWD/.work/qualification" CASK="$candidate"
+          OUTPUT="$output" CASK="$candidate"
