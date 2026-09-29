@@ -1,0 +1,21 @@
+version: '3'
+silent: true
+tasks:
+  check:
+    desc: Check pinned tools and Bash update policy
+    cmds:
+      - "shellcheck --version | grep -F 'version: 0.11.0'"
+      - shellcheck scripts/*.sh
+      - bash scripts/propose-microfat-test.sh
+  qualify:
+    desc: Qualify microfat in a disposable native Homebrew prefix
+    cmds:
+      - mkdir -p .work
+      - task --dir microfat-tools homebrew-check
+      - |-
+        candidate=""
+        if [ -f Casks/microfat.rb ]; then candidate="$PWD/Casks/microfat.rb"; fi
+        output={{.OUTPUT | default ".work/qualification" | shellQuote}}
+        case "$output" in /*) ;; *) output="$PWD/$output" ;; esac
+        task --dir microfat-tools qualify-homebrew \
+          OUTPUT="$output" CASK="$candidate"
