@@ -55,7 +55,7 @@ manually rather than force-pushing over them.
 
 ## Development
 
-Install Task v3.53.1, Go 1.27.1 and ShellCheck v0.11.0. Check out
+Install Task v3.53.1, Go 1.27.2 and ShellCheck v0.11.0. Check out
 `EpicBlackWolfZ/microfat` at the exact commit in `microfat-tools.ref` into
 `microfat-tools/`, then run:
 

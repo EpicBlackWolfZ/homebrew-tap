@@ -10,7 +10,7 @@ in EpicBlackWolfZ/microfat at the reviewed commit in microfat-tools.ref.
 
 Run pinned Task v3.53.1. `task check` requires ShellCheck v0.11.0 and tests the
 update script. `task qualify` requires the pinned upstream tooling checkout at
-microfat-tools and Go 1.27.1; it uses a disposable Homebrew prefix.
+microfat-tools and Go 1.27.2; it uses a disposable Homebrew prefix.
 
 All Bash scripts use `#!/usr/bin/env bash`, `set -euo pipefail`, and
 `IFS=$'\n\t'`. Preserve .shellcheckrc rules without global disables.
