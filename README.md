@@ -21,7 +21,8 @@ brew uninstall --cask microfat
 The cask supports Linux amd64 and arm64. Native macOS remains
 [future work](https://github.com/EpicBlackWolfZ/microfat/issues/17); no Homebrew core submission
 is included. Use a current Homebrew with Linux cask
-support; qualification is pinned to Homebrew 7.0.2.
+support; qualification follows `HOMEBREW_SOURCE` in the reviewed upstream
+tooling's `.config/tool-versions.env`.
 
 Microfat installs the official fat CLI and full/minimal launcher stubs together
 without stripping or rewriting their bytes. Homebrew manages upgrades and
@@ -104,9 +105,10 @@ manually rather than force-pushing over them.
 
 ## Development
 
-Install Task v3.53.1, Go 1.27.2 and ShellCheck v0.11.0. Check out
+Install Task v3.54.0, Go 1.27.3 and ShellCheck v0.11.0. Check out
 `EpicBlackWolfZ/microfat` at the exact commit in `microfat-tools.ref` into
-`microfat-tools/`, then run:
+`microfat-tools/`. CI reads these Go and tool pins from that reviewed checkout.
+Then run:
 
 ```bash
 task check
