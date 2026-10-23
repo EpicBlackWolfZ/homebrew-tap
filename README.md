@@ -7,7 +7,7 @@ casks; each package uses its own release and qualification contract.
 
 | Package | Platforms | Availability |
 | --- | --- | --- |
-| [microfat](https://github.com/EpicBlackWolfZ/microfat/releases/tag/v0.3.0) | Linux amd64 and arm64 | Available; authenticated recipe and native public installation accepted |
+| [microfat v0.3.1](https://github.com/EpicBlackWolfZ/microfat/releases/tag/v0.3.1) | Linux amd64 and arm64 | Available; authenticated recipe and native public installation accepted |
 
 Install, upgrade, reinstall or remove microfat with:
 
@@ -30,9 +30,40 @@ removal. `microfat update --check` remains available; version-changing self-upda
 is refused with Homebrew guidance. Uninstall does not delete workload files,
 microfat caches, or installations managed by another installer.
 
-The first-public-release upgrade check is a same-version check. Cross-version upgrades and
+Public installation acceptance checks same-version upgrades. Cross-version upgrades and
 checksum-failure recovery use controlled fixtures; those fixtures do not prove an upgrade between
 two published microfat versions.
+
+## v0.3.1 acceptance evidence
+
+[v0.3.1](https://github.com/EpicBlackWolfZ/microfat/releases/tag/v0.3.1), source
+`94cb9f6ad26c14931ea28e53a8969f09790eff80`, was published as immutable release `421362795`
+on 2026-10-23 at 05:04:02 UTC. The authenticated recipe has SHA-256
+`786861ca85631f646b9e8ad4d6efbb70c92501d2e166d9d4c20d998cf49c326a`.
+
+[Update microfat 39903752644, attempt 1](https://github.com/EpicBlackWolfZ/homebrew-tap/actions/runs/39903752644/attempts/1)
+authenticated the release and passed native amd64/arm64 lifecycle qualification before proposing
+[recipe PR #7](https://github.com/EpicBlackWolfZ/homebrew-tap/pull/7). Its exact head
+`fba5d11321f41380ef14c40f63e79e797584006b` passed all four
+[Tap CI checks](https://github.com/EpicBlackWolfZ/homebrew-tap/actions/runs/39904088128/attempts/2).
+Attempt 1 required workflow approval; the approved attempt 2 completed successfully.
+The reviewed recipe merged as `ff68d3692df5aa2271e4f803418ed95c5c31b8cd`.
+
+Qualification used reviewed upstream tooling `ada376b4ffffaa3354becbfb70c1896934caf277`,
+Go 1.27.3 and Homebrew 7.0.10 revision `8f10429b56be28a25032b87463fffc95e556b5bc`.
+Each native qualification recorded 102 commands: 91 successes, ten expected Homebrew self-update
+refusals and one expected corrupt-checksum upgrade refusal. These controlled checks retain their
+own scope, separately from installation through the official public tap.
+
+[Public installation acceptance 39904442888, attempt 1](https://github.com/EpicBlackWolfZ/microfat/actions/runs/39904442888/attempts/1)
+passed all four native installer/Homebrew jobs at qualification and product source
+`94cb9f6ad26c14931ea28e53a8969f09790eff80`, using the reviewed recipe merge above.
+Both official remote tap installations passed install, reinstall, same-version upgrade and
+conservative uninstall. All three installed product hashes matched authenticated release bytes.
+Full/minimal launchers executed packed payloads in both memfd and cache modes.
+The [upstream acceptance record](https://github.com/EpicBlackWolfZ/microfat/blob/main/docs/releases/v0.3.1.md#release-acceptance)
+retains the separate product, benchmark, signed-candidate and public installation evidence.
+Documentation in immutable product archives remains frozen.
 
 ## v0.3.0 acceptance evidence
 
