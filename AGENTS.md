@@ -8,9 +8,10 @@ strip its executables, change its hashes by hand, add unsigned download paths, o
 invoke its installer from the cask. Its generator and qualification harness live
 in EpicBlackWolfZ/microfat at the reviewed commit in microfat-tools.ref.
 
-Run pinned Task v3.53.1. `task check` requires ShellCheck v0.11.0 and tests the
+Run pinned Task v3.54.0. `task check` requires ShellCheck v0.11.0 and tests the
 update script. `task qualify` requires the pinned upstream tooling checkout at
-microfat-tools and Go 1.27.2; it uses a disposable Homebrew prefix.
+microfat-tools and Go 1.27.3; it uses a disposable Homebrew prefix. CI reads Go
+from that checkout's go.mod and tool versions from its .config/tool-versions.env.
 
 All Bash scripts use `#!/usr/bin/env bash`, `set -euo pipefail`, and
 `IFS=$'\n\t'`. Preserve .shellcheckrc rules without global disables.
