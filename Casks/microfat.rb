@@ -2,9 +2,9 @@
 cask "microfat" do
   arch arm: "arm64", intel: "amd64"
 
-  version "0.3.0"
-  sha256 arm64_linux:  "f540e09f3461a04615808f7e0e82a93af9f2f9f7129bd27fd74152682b39cdcc",
-         x86_64_linux: "990a92d49897bf4d9b573c09b1d3051d8da1ea6538f42605289bcbc09f9940f0"
+  version "0.3.1"
+  sha256 arm64_linux:  "998a75a54ab401cba3ef527db7986133dc8768a830b8ec4ea69bfba410ed6b39",
+         x86_64_linux: "c8b39f5315546201ee696cb435d0c2a6d29c36fa4b47bd848aef3af94c93f3ca"
 
   url "https://github.com/EpicBlackWolfZ/microfat/releases/download/v#{version}/microfat_#{version}_linux_#{arch}.tar.gz"
   name "microfat"
