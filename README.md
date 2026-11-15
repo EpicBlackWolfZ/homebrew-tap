@@ -136,10 +136,10 @@ manually rather than force-pushing over them.
 
 ## Development
 
-Install Task v3.54.0, Go 1.27.3 and ShellCheck v0.11.0. Check out
-`EpicBlackWolfZ/microfat` at the exact commit in `microfat-tools.ref` into
-`microfat-tools/`. CI reads these Go and tool pins from that reviewed checkout.
-Then run:
+Check out `EpicBlackWolfZ/microfat` at the exact commit in `microfat-tools.ref`
+into `microfat-tools/`. Install the Go version from that checkout's `go.mod`
+and the Task and ShellCheck versions from `.config/tool-versions.env`. CI reads
+the same pins from the reviewed checkout. Then run:
 
 ```bash
 task check
